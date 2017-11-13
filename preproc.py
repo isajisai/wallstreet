@@ -2,6 +2,8 @@
 from collections import Counter
 import numpy as np
 import pandas as pd
+from sklearn import svm, cross_validation, neighbors
+from sklearn.ensemble import VotingClassifier, RandomForestClassifier
 
 def process_for_labels(ticker):
 	hm_days = 7
