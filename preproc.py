@@ -2,7 +2,7 @@
 from collections import Counter
 import numpy as np
 import pandas as pd
-from sklearn import svm, cross_validation, neighbors
+from sklearn import svm, model_selection, neighbors
 from sklearn.ensemble import VotingClassifier, RandomForestClassifier
 
 def process_for_labels(ticker):
@@ -53,4 +53,29 @@ def all_featuresets(tickers):
 		list.append(get_featuresets(ticker))
 	return list
 
-all_featuresets(process_for_labels('AAPL')[0])
+def do_ml(ticker):
+	X, y, df = get_featuresets(ticker)
+	X_train, X_test, y_train, y_test = model_selection.train_test_split(X, y, test_size = 0.25)
+	clf = neighbors.KNeighborsClassifier()
+	clf.fit(X_train, y_train)
+	confidence = clf.score(X_test, y_test)
+	print('accuracy:',confidence)
+	predictions = clf.predict(X_test)
+	print('predicted class counts:',Counter(predictions))
+	print('`~~~~~~~~~~~~~~~~~~~~~~~~~~~~~')
+
+def all_ml(tickers):
+	for ticker in tickers:
+		do_ml(ticker)
+
+all_ml(process_for_labels('AAPL')[0])
+
+
+
+
+
+
+
+
+
+
