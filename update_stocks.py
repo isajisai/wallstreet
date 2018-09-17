@@ -1,5 +1,5 @@
-
-
+import multiprocessing
+import glob
 import os
 import datetime as dt 
 import matplotlib.pyplot as plt 
@@ -13,28 +13,23 @@ now = dt.datetime.now()
 date = dt.datetime(now.year, now.month, now.day)
 yesterday = dt.datetime(now.year, now.month, now.day-1)
 directory = os.fsencode('stocks')
-site = 'yahoo'
+filenames = glob.glob("stocks/*.csv")
 
-print("Updating...")
-def retrieve_dframe(ticker, src, start, end, tries_left):
-	if tries_left == 0:
-		return None
-	try:
-		print("Trying...")
-		return web.DataReader(ticker, src, start, end)
-	except:
-		print("Nope.")
-		return retrieve_dframe(ticker, src, start, end, tries_left-1)
+import fix_yahoo_finance as yf
+yf.pdr_override()
 
-for file in os.listdir(directory):
-	filename = os.fsdecode(file)
-	if filename.endswith(".csv"):
-	    ticker = filename.replace('.csv', '')
-	    print('{}'.format(ticker))
-	    df = retrieve_dframe(ticker, site, yesterday, date, 10)
-	    if df is None:
-	    	print('UNSUCCESSFUL UPDATE: {}', ticker)
-	    	continue
-	    else:
-	    	print(df.head())
-	    	# print('Successful update: {}', ticker)
+def mp_worker(filename):
+	ticker = filename.replace("stocks/", "").replace(".csv", "")
+	df = web.get_data_yahoo(ticker, yesterday, date)
+	if df is None:
+		print('UNSUCCESSFUL UPDATE: {}'.format(ticker))
+	df.to_csv('stocks/{}.csv'.format(ticker))
+	print("SUCCESSFUL UPDATE: {}".format(ticker))
+
+# def mp_handler():
+# 	p = multiprocessing.Pool(100)
+# 	p.map(mp_worker, filenames)
+
+if __name__ == "__main__":
+	for filename in filenames:
+		mp_worker(filename)

@@ -1,13 +1,3 @@
-
-""" Project: Statistic Utilities 
-	Description: useful utilities
-	Filename: utils.py
-"""
-
-########################
-## Section I: Vanilla ##
-########################
-
 def amean(lst):
 	summ = 0
 	for item in lst:
@@ -34,5 +24,4 @@ def cron_alpha(lst):
 	for item in lst:
 		summ += item
 	return (k / (k - 1)) * (1 - (summ / std))
-
 

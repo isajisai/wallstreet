@@ -17,18 +17,20 @@ src = 'yahoo'
 start = dt.datetime(2000, 1, 1)
 end = dt.datetime(now.year, now.month, now.day)
 
-def retrieve_dframe(ticker, src, start, end, tries_left):
+import fix_yahoo_finance as yf
+yf.pdr_override()
+
+def retrieve_dframe(ticker, start, end, tries_left):
 	if tries_left == 0:
 		return None
 	try: 
-		return web.DataReader(ticker, src, start, end)
+		return web.get_data_yahoo(ticker, start, end)
 	except:
-		return retrieve_dframe(ticker, src, start, end, tries_left-1)
+		return retrieve_dframe(ticker, start, end, tries_left-1)
 
-## NOTE: For yahoo finance, use - instaed of .
 def make_csv(ticker, src, start, end):
 	ticker = ticker.replace('.', '-')
-	ds = retrieve_dframe(ticker, src, start, end, 10)
+	ds = retrieve_dframe(ticker, start, end, 10)
 	if ds is None:
 		print('UNSUCCESSFUL LOAD: ' + ticker)
 		return
